@@ -83,44 +83,11 @@ total_repayment = np.sum(repay_array)
 st.markdown(f"<h1 style='text-align: center;'>Total Repayment over {years} years: £{round(total_repayment)} </h1>", unsafe_allow_html=True)
 
 
-# # Create a graph of extra repayment rates and the npv and total  --------------------------------
-# discount_rate = 0.02  # Discount rate for NPV calculation
-# repay_rates = np.arange(9, 31, 1)
-# npv_values = []
-# non_npv_values = []
-
-# for rate in repay_rates:
-#     repay_array, amount_array = simulate_repayment(years=years, amount=amount, interest=interest, rate=rate)
-#     npv = sum(repay_array[i] / ((1 + discount_rate) ** i) for i in range(years))
-#     npv_values.append(npv)
-
-# for rate in repay_rates:
-#     repay_array, amount_array = simulate_repayment(years=years, amount=amount, interest=interest, rate=rate)
-#     non_npv = np.sum(repay_array)
-#     non_npv_values.append(non_npv)
-
-# npv_values_check = st.checkbox("NPV Values")
-
-# if npv_values_check:
-#     st.subheader("NPV of Repayments at Different Repayment Rates (%)")
-#     st.bar_chart(pd.DataFrame(npv_values, index=repay_rates, columns=["NPV of Repayments"]))
-# else:
-#     st.subheader("Total Repayment at Different Repayment Rates (%)")
-#     st.bar_chart(pd.DataFrame(non_npv_values, index=repay_rates, columns=["Total Repayment"]))
-
-
-
 st.subheader("Should you increase your repayment rate?")
 
-# ------------------------------------------------------------------
-# 1.  Repayment rates to test (9 % base, up to 15 % user‑chosen max)
-# ------------------------------------------------------------------
 max_extra = st.slider("Extra repayment (%)", 0, 21, 0)   # 0–6 extra → 9–15 total
 rates_to_test = np.array([9, 9 + max_extra])            # e.g. [9, 15]
 
-# ------------------------------------------------------------------
-# 2.  Simulate both scenarios
-# ------------------------------------------------------------------
 salary_array = simulate_salary(salary, increase, years)
 
 totals, npvs = [], []
@@ -144,10 +111,6 @@ npv_base,    npv_high    = npvs
 
 delta_cash = total_high - total_base      # extra you pay in £
 delta_npv  = npv_base   - npv_high        # interest you save in £ (today's value)
-
-# ------------------------------------------------------------------
-# 3.  Decide & display
-# ------------------------------------------------------------------
 
 if max_extra == 0:
     st.info("Slide the **Extra repayment (%)** above 0 % to see the comparison.")
@@ -173,7 +136,7 @@ st.markdown(r"""
 
 **Definition**  
 *Net Present Value* is the value **today** of a series of future cash flows after each one is discounted by a chosen rate (e.g. inflation or required return).  
-For liabilities like student‑loan repayments, the plan with the **lower NPV** is cheaper in today's money.
+For liabilities like student‑loan repayments, the plan with the **lower NPV** is cheaper in today's money. The defaulty discount rate is 2 % (e.g. UK inflation target).
 
 **Formula**
 
