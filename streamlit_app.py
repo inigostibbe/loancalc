@@ -136,7 +136,7 @@ st.markdown(r"""
 
 **Definition**  
 *Net Present Value* is the value **today** of a series of future cash flows after each one is discounted by a chosen rate (e.g. inflation or required return).  
-For liabilities like student‑loan repayments, the plan with the **lower NPV** is cheaper in today's money. The defaulty discount rate is 2 % (e.g. UK inflation target).
+For liabilities like student‑loan repayments, the plan with the **lower NPV** is cheaper in today's money. The default discount rate is 2 % (e.g. UK inflation target).
 
 **Formula**
 
