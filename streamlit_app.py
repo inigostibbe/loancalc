@@ -20,51 +20,12 @@ with col2:
 with col3:
     salary = st.number_input("Expected starting salary (5% YoY increase)", value = 30000, step = 500)
 
-# Add checkbox for auto-calculation of tax and NI
-calc_net_salary = st.checkbox("Auto-calculate tax and National Insurance on salary")
-
-# UK tax and NI calculation function (2023/24 bands)
-def calculate_net_salary(gross_salary):
-    # Income Tax
-    personal_allowance = 12570
-    basic_rate_limit = 50270
-    higher_rate_limit = 125140
-    
-    # Income Tax
-    if gross_salary <= personal_allowance:
-        tax = 0
-    elif gross_salary <= basic_rate_limit:
-        tax = (gross_salary - personal_allowance) * 0.20
-    elif gross_salary <= higher_rate_limit:
-        tax = (basic_rate_limit - personal_allowance) * 0.20 + (gross_salary - basic_rate_limit) * 0.40
-    else:
-        # Personal allowance is reduced £1 for every £2 over £100,000
-        reduced_allowance = max(0, personal_allowance - (gross_salary - 100000) / 2)
-        taxable = gross_salary - reduced_allowance
-        tax = (basic_rate_limit - reduced_allowance) * 0.20 + (higher_rate_limit - basic_rate_limit) * 0.40 + (gross_salary - higher_rate_limit) * 0.45
-
-    # National Insurance (Class 1, employee)
-    ni_lower_limit = 12570
-    ni_upper_limit = 50270
-    if gross_salary <= ni_lower_limit:
-        ni = 0
-    elif gross_salary <= ni_upper_limit:
-        ni = (gross_salary - ni_lower_limit) * 0.12
-    else:
-        ni = (ni_upper_limit - ni_lower_limit) * 0.12 + (gross_salary - ni_upper_limit) * 0.02
-
-    net_salary = gross_salary - tax - ni
-    return net_salary
-
 # Modify salary simulation to use net salary if checkbox is checked
 def simulate_salary(salary, increase, years, calc_net_salary=False):
     salary_array = np.zeros(years)
     for idx in range(years):
         gross = salary * (1 + increase / 100) ** idx
-        if calc_net_salary:
-            salary_array[idx] = calculate_net_salary(gross)
-        else:
-            salary_array[idx] = gross
+        salary_array[idx] = gross
     return salary_array
 
 # Extra inputs for advanced users
@@ -86,15 +47,7 @@ else:
     discount_rate = 0.02
 
 # Now assign salary_array after increase and years are always defined
-salary_array = simulate_salary(salary, increase, years, calc_net_salary=calc_net_salary)
-
-# Display salary info to user
-if calc_net_salary:
-    st.info(f"First-year net salary after tax and NI: £{salary_array[0]:,.0f} (used for all calculations)")
-    st.line_chart(salary_array)
-else:
-    st.info(f"First-year gross salary: £{salary_array[0]:,.0f} (used for all calculations)")
-
+salary_array = simulate_salary(salary, increase, years)
 
 # Calc loan repayment and remaining amount
 
@@ -147,7 +100,7 @@ max_extra = st.slider("Extra repayment (%)", 0, 21, 0)   # 0–6 extra → 9–1
 rates_to_test = np.array([9, 9 + max_extra])            # e.g. [9, 15]
 
 # Also update the second call to simulate_salary (for extra repayment comparison)
-salary_array = simulate_salary(salary, increase, years, calc_net_salary=calc_net_salary)
+salary_array = simulate_salary(salary, increase, years)
 
 totals, npvs = [], []
 
