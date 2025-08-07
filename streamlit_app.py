@@ -6,7 +6,7 @@ st.set_page_config(layout="wide")
 
 st.title("Welcome to the Loan Calculator App!")
 st.markdown("""
-This app helps you estimate your student loan repayments over time based on your loan amount, interest rate, and expected salary growth. You can explore different repayment scenarios, compare the impact of extra repayments, and understand the total and net present value (NPV) of your repayments.
+This interactive app helps you estimate and visualize your student loan repayments over time. Enter your loan amount, interest rate, and expected salary growth to see how your repayments and remaining balance change year by year. You can also explore advanced options, compare different repayment rates, and understand the total and net present value (NPV) of your repayments. Use this tool to make informed decisions about your student loan strategy!
 """)
 
 advanced = st.checkbox("Advanced Mode")
