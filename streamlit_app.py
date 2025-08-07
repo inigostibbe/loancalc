@@ -123,11 +123,18 @@ else:
     st.write(f"Higher rate ({9+max_extra} %): **£{total_high:,.0f}** total, NPV £{npv_high:,.0f}")
 
     if delta_npv > delta_cash:
-        st.success(
-            f"✅ Paying {9+max_extra} % looks better: "
-            f"saves ≈£{delta_npv:,.0f} in today’s money "
-            f"for an extra £{delta_cash:,.0f} of nominal cash."
-        )
+        if delta_cash >= 0:
+            st.success(
+                f"✅ Paying {9+max_extra} % looks better: "
+                f"saves ≈£{delta_npv:,.0f} in today’s money "
+                f"for an extra £{delta_cash:,.0f} of nominal cash."
+            )
+        else:
+            st.success(
+                f"✅ Paying {9+max_extra} % looks better: "
+                f"saves ≈£{delta_npv:,.0f} in today’s money "
+                f"and reduces your total cash outlay by £{abs(delta_cash):,.0f}."
+            )
     else:
         st.info(
             f"💡 Stick to 9 %: extra cash up‑front (£{delta_cash:,.0f}) "
