@@ -7,7 +7,7 @@ st.set_page_config(layout="wide")
 st.markdown("<h1 style='text-align: center;'>Welcome to the Loan Calculator App!</h1>", unsafe_allow_html=True)
 
 st.markdown("""
-This interactive app helps you estimate and visualize your student loan repayments over time. Enter your loan amount, interest rate, and expected salary growth to see how your repayments and remaining balance change year by year. You can also explore advanced options, compare different repayment rates, and understand the total and net present value (NPV) of your repayments. Use this tool to make informed decisions about your student loan strategy!
+This interactive app helps you estimate and visualise your student loan repayments over time. Enter your loan amount, interest rate, and expected salary growth to see how your repayments and remaining balance change year by year. You can also explore advanced options, compare different repayment rates, and understand the total and net present value (NPV) of your repayments. Use this tool to make informed decisions about your student loan strategy!
 """)
 
 advanced = st.checkbox("Advanced Mode")
@@ -20,7 +20,55 @@ with col2:
 with col3:
     salary = st.number_input("Expected starting salary (5% YoY increase)", value = 30000, step = 500)
 
+# Add checkbox for auto-calculation of tax and NI
+calc_net_salary = st.checkbox("Auto-calculate tax and National Insurance on salary")
+
+# UK tax and NI calculation function (2023/24 bands)
+def calculate_net_salary(gross_salary):
+    # Income Tax
+    personal_allowance = 12570
+    basic_rate_limit = 50270
+    higher_rate_limit = 125140
+    
+    # Income Tax
+    if gross_salary <= personal_allowance:
+        tax = 0
+    elif gross_salary <= basic_rate_limit:
+        tax = (gross_salary - personal_allowance) * 0.20
+    elif gross_salary <= higher_rate_limit:
+        tax = (basic_rate_limit - personal_allowance) * 0.20 + (gross_salary - basic_rate_limit) * 0.40
+    else:
+        # Personal allowance is reduced £1 for every £2 over £100,000
+        reduced_allowance = max(0, personal_allowance - (gross_salary - 100000) / 2)
+        taxable = gross_salary - reduced_allowance
+        tax = (basic_rate_limit - reduced_allowance) * 0.20 + (higher_rate_limit - basic_rate_limit) * 0.40 + (gross_salary - higher_rate_limit) * 0.45
+
+    # National Insurance (Class 1, employee)
+    ni_lower_limit = 12570
+    ni_upper_limit = 50270
+    if gross_salary <= ni_lower_limit:
+        ni = 0
+    elif gross_salary <= ni_upper_limit:
+        ni = (gross_salary - ni_lower_limit) * 0.12
+    else:
+        ni = (ni_upper_limit - ni_lower_limit) * 0.12 + (gross_salary - ni_upper_limit) * 0.02
+
+    net_salary = gross_salary - tax - ni
+    return net_salary
+
+# Modify salary simulation to use net salary if checkbox is checked
+def simulate_salary(salary, increase, years, calc_net_salary=False):
+    salary_array = np.zeros(years)
+    for idx in range(years):
+        gross = salary * (1 + increase / 100) ** idx
+        if calc_net_salary:
+            salary_array[idx] = calculate_net_salary(gross)
+        else:
+            salary_array[idx] = gross
+    return salary_array
+
 # Extra inputs for advanced users
+
 if advanced:
     with col1:    
         increase = st.number_input("Average pay increase (%)", value = 5)
@@ -37,14 +85,16 @@ else:
     repay_percentage = 9.0
     discount_rate = 0.02
 
-# Calc salary
-def simulate_salary(salary, increase, years):
-    salary_array = np.zeros(years)
-    for idx in range(years):
-        salary_array[idx] = salary * (1 + increase / 100) ** idx
-    return salary_array
+# Now assign salary_array after increase and years are always defined
+salary_array = simulate_salary(salary, increase, years, calc_net_salary=calc_net_salary)
 
-salary_array = simulate_salary(salary, increase, years)
+# Display salary info to user
+if calc_net_salary:
+    st.info(f"First-year net salary after tax and NI: £{salary_array[0]:,.0f} (used for all calculations)")
+    st.line_chart(salary_array)
+else:
+    st.info(f"First-year gross salary: £{salary_array[0]:,.0f} (used for all calculations)")
+
 
 # Calc loan repayment and remaining amount
 
@@ -96,7 +146,8 @@ st.subheader("Should you increase your repayment rate?")
 max_extra = st.slider("Extra repayment (%)", 0, 21, 0)   # 0–6 extra → 9–15 total
 rates_to_test = np.array([9, 9 + max_extra])            # e.g. [9, 15]
 
-salary_array = simulate_salary(salary, increase, years)
+# Also update the second call to simulate_salary (for extra repayment comparison)
+salary_array = simulate_salary(salary, increase, years, calc_net_salary=calc_net_salary)
 
 totals, npvs = [], []
 
@@ -122,8 +173,8 @@ delta_npv  = npv_base   - npv_high        # interest you save in £ (today's val
 if max_extra == 0:
     st.info("Slide the **Extra repayment (%)** above 0 % to see the comparison.")
 else:
-    st.write(f"Base rate (9 %): **£{total_base:,.0f}** total, NPV £{npv_base:,.0f}")
-    st.write(f"Higher rate ({9+max_extra} %): **£{total_high:,.0f}** total, NPV £{npv_high:,.0f}")
+    st.write(f"Base rate (9 %): **£{total_base:,.0f}** total, NPV £{npv_base:,.0f} (Discount rate: {discount_rate*100:.1f}%)")
+    st.write(f"Higher rate ({9+max_extra} %): **£{total_high:,.0f}** total, NPV £{npv_high:,.0f} (Discount rate: {discount_rate*100:.1f}%)")
 
     if delta_npv > delta_cash:
         if delta_cash >= 0:
