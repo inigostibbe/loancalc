@@ -4,7 +4,7 @@ import pandas as pd
 
 st.set_page_config(layout="wide")
 
-st.title("Welcome to the Loan Calculator App!")
+st.title("<h1 style='text-align: center;'>Welcome to the Loan Calculator App!</h1>", unsafe_allow_html=True)
 st.markdown("""
 This interactive app helps you estimate and visualize your student loan repayments over time. Enter your loan amount, interest rate, and expected salary growth to see how your repayments and remaining balance change year by year. You can also explore advanced options, compare different repayment rates, and understand the total and net present value (NPV) of your repayments. Use this tool to make informed decisions about your student loan strategy!
 """)
@@ -27,11 +27,14 @@ if advanced:
         years = st.number_input("Years", value = 30)
     with col3:
         repay_percentage = st.number_input("Repayment percentage (Default = 9%)", min_value = 9.0, max_value = 100.0, step = 0.1, value = 9.0)
+    # Add discount rate slider for advanced users
+    discount_rate = st.slider("Discount rate (inflation, %)", min_value=0.0, max_value=10.0, value=2.0, step=0.1) / 100
 else:
     # Default values for non-advanced users
     increase = 5
     years = 30
     repay_percentage = 9.0
+    discount_rate = 0.02
 
 # Calc salary
 def simulate_salary(salary, increase, years):
@@ -95,7 +98,6 @@ rates_to_test = np.array([9, 9 + max_extra])            # e.g. [9, 15]
 salary_array = simulate_salary(salary, increase, years)
 
 totals, npvs = [], []
-discount_rate = 0.02
 
 for rate in rates_to_test:
     repay, _ = simulate_repayment(
