@@ -5,6 +5,10 @@ import pandas as pd
 st.set_page_config(layout="wide")
 
 st.title("Welcome to the Loan Calculator App!")
+st.markdown("""
+This app helps you estimate your student loan repayments over time based on your loan amount, interest rate, and expected salary growth. You can explore different repayment scenarios, compare the impact of extra repayments, and understand the total and net present value (NPV) of your repayments.
+""")
+
 advanced = st.checkbox("Advanced Mode")
 
 col1, col2, col3 = st.columns(3)
