@@ -130,11 +130,18 @@ else:
                 f"for an extra £{delta_cash:,.0f} of nominal cash."
             )
         else:
-            st.success(
-                f"✅ Paying {9+max_extra} % looks better: "
-                f"saves ≈£{delta_npv:,.0f} in today’s money "
-                f"and reduces your total cash outlay by £{abs(delta_cash):,.0f}."
-            )
+            if delta_npv >= 0:
+                st.success(
+                    f"✅ Paying {9+max_extra} % looks better: "
+                    f"saves ≈£{delta_npv:,.0f} in today’s money "
+                    f"and reduces your total cash outlay by £{abs(delta_cash):,.0f}."
+                )
+            else:
+                st.warning(
+                    f"⚠️ Paying {9+max_extra} % reduces your total cash outlay by £{abs(delta_cash):,.0f}, "
+                    f"but costs you ≈£{abs(delta_npv):,.0f} more in today’s money (NPV). "
+                    f"It may not be worth increasing your repayment rate from a financial perspective."
+                )
     else:
         st.info(
             f"💡 Stick to 9 %: extra cash up‑front (£{delta_cash:,.0f}) "
