@@ -7,7 +7,7 @@ st.set_page_config(layout="wide")
 st.markdown("<h1 style='text-align: center;'>Welcome to the Loan Calculator App!</h1>", unsafe_allow_html=True)
 
 st.markdown("""
-This interactive app helps you estimate and visualise your student loan repayments over time. Enter your loan amount, interest rate, and expected salary growth to see how your repayments and remaining balance change year by year. You can also explore advanced options, compare different repayment rates, and understand the total and net present value (NPV) of your repayments. Use this tool to make informed decisions about your student loan strategy!
+This app helps you estimate and visualise your student loan repayments over time. Enter your loan amount, interest rate, and expected starting salary to see how your repayments and remaining balance change year by year. You can also explore advanced options, compare different repayment rates, and understand the total and net present value (NPV) of your repayments. Use this tool to make informed decisions about your student loan strategy, whether it may be worth it to try to pay it off early!
 """)
 
 advanced = st.checkbox("Advanced Mode")
@@ -160,8 +160,7 @@ st.markdown(r"""
 ### Net Present Value (NPV)
 
 **Definition**  
-*Net Present Value* is the value **today** of a series of future cash flows after each one is discounted by a chosen rate (e.g. inflation or required return).  
-For liabilities like student‑loan repayments, the plan with the **lower NPV** is cheaper in today's money. The default discount rate is 2 % (e.g. UK inflation target).
+Net Present Value (NPV) is the total amount of money you spend, adjusted to account for future inflation. It shows what your repayments are really worth in today's money, not just the total you pay over time. 
 
 **Formula**
 
